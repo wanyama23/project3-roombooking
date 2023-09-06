@@ -123,6 +123,29 @@ class Customer(Base):
         
     def get_bookings(self):
         return session.query(Booking).filter_by(customer_id=self.id).all()
+    
+
+    def get_current_bookings(self):
+        today = Date.today()
+        return session.query(Booking).filter(
+            Booking.customer_id == self.id,
+            Booking.check_in_date <= today,
+            Booking.check_out_date >= today
+        ).all()
+
+    def get_past_bookings(self):
+        today = Date.today()
+        return session.query(Booking).filter(
+            Booking.customer_id == self.id,
+            Booking.check_out_date < today
+        ).all()
+
+    def get_upcoming_bookings(self):
+        today = Date.today()
+        return session.query(Booking).filter(
+            Booking.customer_id == self.id,
+            Booking.check_in_date > today
+        ).all()
 
 
 
@@ -140,3 +163,25 @@ class Booking(Base):
     
    def get_duration(self):
         return (self.check_out_date - self.check_in_date).days
+
+   def get_total_price(self):
+        room = session.query(Room).get(self.room_id)
+        return room.room_price * self.get_duration()
+
+   def is_current(self):
+        today = Date.today()
+        return self.check_in_date <= today <= self.check_out_date
+
+   def extend_booking(self, new_check_out_date):
+        if new_check_out_date > self.check_out_date:
+            self.check_out_date = new_check_out_date
+            session.commit()
+            return True
+        else:
+            return False
+
+   def cancel_booking(self):
+        room = session.query(Room).get(self.room_id)
+        room.remove_booking(self)
+        session.delete(self)
+        session.commit()
