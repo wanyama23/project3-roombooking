@@ -61,6 +61,37 @@ class Room(Base):
             return booking
         else:
             return None
+    def remove_booking(self, booking):
+        session.delete(booking)
+        session.commit()
+
+    def get_total_price(self, check_in_date, check_out_date):
+        num_of_days = (check_out_date - check_in_date).days
+        return self.room_price * num_of_days
+
+    def get_occupancy(self, check_in_date, check_out_date):
+        bookings = self.get_bookings()
+        occupancy = 0
+        for booking in bookings:
+            if (
+                check_in_date < booking.check_out_date
+                and check_out_date > booking.check_in_date
+            ):
+                occupancy += booking.customer_count
+        return occupancy
+
+    def get_total_capacity(self):
+        return self.room_capacity
+
+    def get_available_capacity(self, check_in_date, check_out_date):
+        total_capacity = self.get_total_capacity()
+        occupancy = self.get_occupancy(check_in_date, check_out_date)
+        available_capacity = total_capacity - occupancy
+        return available_capacity
+
+    def is_full(self, check_in_date, check_out_date):
+        available_capacity = self.get_available_capacity(check_in_date, check_out_date)
+        return available_capacity == 0
 
 class Customer(Base):
     __tablename__ = 'customers'
