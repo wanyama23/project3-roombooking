@@ -72,6 +72,27 @@ class Customer(Base):
     bookings = relationship("Booking",backref="customer")
     rooms = relationship("Room", secondary="room_customer", back_populates="customers")
 
+    def __repr__(self):
+        return f'<Customer id={self.id}, name={self.book_name}>'
+
+    def make_booking(self, room, check_in_date, check_out_date):
+        if room.is_available(check_in_date, check_out_date):
+      
+            booking = Booking(
+                room_id=room.id,
+                customer_id=self.id,
+                check_in_date=check_in_date,
+                check_out_date=check_out_date
+            )
+            session.add(booking)
+            session.commit()
+            return booking
+        else:
+            return None
+        
+    def get_bookings(self):
+        return session.query(Booking).filter_by(customer_id=self.id).all()
+
 
 
 class Booking(Base):
