@@ -40,7 +40,27 @@ class Room(Base):
             ):
                 return False
         return True
+    def get_available_rooms(self, check_in_date, check_out_date):
+        available_rooms = []
+        for room in self.query.all():
+            if room.is_available(check_in_date, check_out_date):
+                available_rooms.append(room)
+        return available_rooms
     
+    
+    def add_booking(self, customer, check_in_date, check_out_date):
+        if self.is_available(check_in_date, check_out_date):
+            booking = Booking(
+                room_id=self.id,
+                customer_id=customer.id,
+                check_in_date=check_in_date,
+                check_out_date=check_out_date
+            )
+            session.add(booking)
+            session.commit()
+            return booking
+        else:
+            return None
 
 class Customer(Base):
     __tablename__ = 'customers'
@@ -51,3 +71,20 @@ class Customer(Base):
     email = Column(String())
     bookings = relationship("Booking",backref="customer")
     rooms = relationship("Room", secondary="room_customer", back_populates="customers")
+
+
+
+class Booking(Base):
+   __tablename__ = 'bookings'
+
+   id = Column(Integer(), primary_key=True)
+   customer_id = Column(Integer(), ForeignKey('customers.id'))
+   check_in_date = Column(Date)
+   check_out_date = Column(Date)
+   room_id= Column(Integer(), ForeignKey('rooms.id'))
+   def __repr__(self):
+        return f'<Booking id={self.id}, customer_id={self.customer_id}>'
+    
+    
+   def get_duration(self):
+        return (self.check_out_date - self.check_in_date).days
