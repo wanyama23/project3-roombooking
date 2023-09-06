@@ -24,3 +24,16 @@ if __name__ == "__main__":
         )
         session.add(customer)
         customers.append(customer)
+
+    rooms = []
+    for _ in range (20):
+        room = Room(
+           
+            room_number= random.randint(10,20),
+            
+            room_price=random.randint(100,200),
+            room_capacity=random.randint(10,20)
+            
+        )
+        session.add(room)
+        rooms.append(room)
