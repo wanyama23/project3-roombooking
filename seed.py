@@ -37,3 +37,24 @@ if __name__ == "__main__":
         )
         session.add(room)
         rooms.append(room)
+
+    existing_combinations=set()
+    for _ in range (20):
+        customer_id = random.randint(1,20)
+        room_id = random.randint(1,20)
+        if (customer_id,room_id)  in existing_combinations:
+            continue
+        existing_combinations.add((customer_id,room_id))
+        room_customer_data = {"customer_id":customer_id,"room_id":room_id}
+        stmt= insert(room_customer).values(room_customer_data)
+        session.execute(stmt)
+    
+    for _ in range(20):
+        booking = Booking(
+            customer_id=random.choice(customers).id,
+            check_in_date=datetime.now()+timedelta(days=random.randint(1,30)),
+            check_out_date=datetime.now()+timedelta(days=random.randint(1,30))
+        )
+        session.add(booking)
+    session.commit()
+    session.close()
