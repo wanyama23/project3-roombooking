@@ -19,3 +19,17 @@ def add_customer(book_name, phone_number, email):
     session.add(customer)
     session.commit()
     print("Customer added successfully")
+
+
+
+#creating a new Room object with the specified number, type, capacity, and price, and then adding it to the session object.
+@cli.command()  
+@click.option("--room_number", prompt="enter room number")
+@click.option("--room_type", prompt="enter room type")
+@click.option("--room_capacity", prompt="enter room capacity")
+@click.option("--room_price", prompt="enter room price")
+def add_room(room_number, room_type, room_capacity, room_price):
+    room = Room(room_number=room_number, room_type=room_type, room_capacity=room_capacity, room_price=room_price)
+    session.add(room)
+    session.commit()
+    print("Room added successfully")
