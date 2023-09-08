@@ -33,3 +33,14 @@ def add_room(room_number, room_type, room_capacity, room_price):
     session.add(room)
     session.commit()
     print("Room added successfully")
+
+def book_room(customer_id, check_in_date, check_out_date):
+    booking = Booking(customer_id=customer_id, check_in_date=check_in_date, check_out_date=check_out_date)
+    session.add(booking)
+    session.commit()
+    print("Room booked successfully")
+cli.add_command(add_customer)   
+cli.add_command(add_room)
+cli.add_command(book_room)
+if __name__ == "__main__":
+    cli()
